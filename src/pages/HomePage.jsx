@@ -6,6 +6,9 @@
   // 라우터를 위한 패키지
   import { Link } from "react-router-dom";
   import { useNavigate } from "react-router-dom";
+  // GH Pages 서브경로 대응용 asset 헬퍼
+  const asset = (p) => `${import.meta.env.BASE_URL}${p}`;
+
 
   export default function Component() {
     const navigate = useNavigate();
@@ -110,16 +113,16 @@
     };
 
     // 인기 상품 정보, name, logo 하드 코딩, 추후 수정 필요함
-    const popularBrands = [
-      { name: "Apple", logo: "/placeholder.svg?height=80&width=120" },
-      { name: "Samsung", logo: "/placeholder.svg?height=80&width=120" },
-      { name: "Nike", logo: "/placeholder.svg?height=80&width=120" },
-      { name: "Adidas", logo: "/placeholder.svg?height=80&width=120" },
-      { name: "Sony", logo: "/placeholder.svg?height=80&width=120" },
-      { name: "Microsoft", logo: "/placeholder.svg?height=80&width=120" },
-      { name: "Google", logo: "/placeholder.svg?height=80&width=120" },
-      { name: "Amazon", logo: "/placeholder.svg?height=80&width=120" },
-    ];
+  const popularBrands = [
+    { name: "Apple",     logo: asset("placeholder.svg?height=80&width=120") },
+    { name: "Samsung",   logo: asset("placeholder.svg?height=80&width=120") },
+    { name: "Nike",      logo: asset("placeholder.svg?height=80&width=120") },
+    { name: "Adidas",    logo: asset("placeholder.svg?height=80&width=120") },
+    { name: "Sony",      logo: asset("placeholder.svg?height=80&width=120") },
+    { name: "Microsoft", logo: asset("placeholder.svg?height=80&width=120") },
+    { name: "Google",    logo: asset("placeholder.svg?height=80&width=120") },
+    { name: "Amazon",    logo: asset("placeholder.svg?height=80&width=120") },
+  ];
 
     return (
       <div
@@ -281,7 +284,7 @@
                   >
                     <div className="flex items-center justify-center h-20 mb-4">
                       <img
-                        src={brand.logo || "/placeholder.svg"}
+                        src={brand.logo || asset("placeholder.svg")}
                         alt={`${brand.name} logo`}
                         width={120}
                         height={80}

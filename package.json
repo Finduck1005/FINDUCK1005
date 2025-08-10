@@ -1,6 +1,7 @@
 {
   "name": "finduck",
   "private": true,
+  "homepage": "https://finduck1005.github.io/FINDUCK1005/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

@@ -1,5 +1,5 @@
 // App.jsx
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
+import { HashRouter, Route, Routes, Navigate } from 'react-router-dom'
 import HomePage from './pages/HomePage.jsx'
 import MyPage from './pages/MyPage.jsx'
 import SearchResultPage from './pages/SearchResultPage.jsx'
@@ -14,7 +14,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 export default function App() {
   return (
-    <BrowserRouter basename="/FINDUCK1005">
+    <HashRouter>
       <Routes>
         {/* 공개 라우트 */}
         <Route path="/" element={<HomePage />} />
@@ -35,6 +35,6 @@ export default function App() {
         {/* 없는 경로는 홈으로 */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }

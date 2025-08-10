@@ -34,7 +34,7 @@ export default function ProductDetail() {
         const { data, error } = await supabase
           .from('Goods')
           .select('*')
-          .eq('id', id)
+          .eq('id', Number(id))
           .single();
 
         if (error) {
@@ -672,9 +672,9 @@ export default function ProductDetail() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {marketActivity.selling.map((item) => (
           <Link
-            key={item.id}
-            href={`/post/${item.id}`}
-            className={`${getCardClasses()} rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer`}
+             key={item.id}
+             to={`/post/${item.id}`}
+              className={`${getCardClasses()} rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer`}
           >
             <div className="relative">
               <img src={item.thumbnail || "/placeholder.svg"} alt="Product thumbnail" className="w-full h-64 object-cover" />
@@ -713,7 +713,7 @@ export default function ProductDetail() {
               {marketActivity.buying.map((item) => (
                 <Link
                   key={item.id}
-                  href={`/post/${item.id}`}
+                  to={`/post/${item.id}`}
                   className={`${getCardClasses()} rounded-lg p-4 flex flex-col justify-between hover:shadow-lg transition-shadow cursor-pointer`}
                 >
                   <div>

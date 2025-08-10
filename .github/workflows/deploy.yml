@@ -1,54 +1,57 @@
-name: Deploy Vite to GitHub Pages
+name: Vite 앱을 GitHub Pages에 배포
 
 on:
-  push: { branches: [ main ] }
+  # 'main' 브랜치에 푸시될 때마다 워크플로우를 실행합니다.
+  push:
+    branches: ['main']
+  # GitHub Actions 탭에서 워크플로우를 수동으로 실행할 수 있도록 허용합니다.
   workflow_dispatch:
 
+# 워크플로우에 필요한 권한을 설정합니다.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
+  contents: read # 저장소 내용을 읽을 수 있는 권한
+  pages: write   # GitHub Pages에 배포할 수 있는 권한
+  id-token: write # OIDC 토큰을 요청하고 배포의 출처를 확인할 수 있는 권한
 
 jobs:
+  # 빌드 작업: Vite 프로젝트를 빌드하고 배포할 아티팩트를 업로드합니다.
   build:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages        # ✅ 환경 비밀값을 build에서도 사용
+    runs-on: ubuntu-latest # 이 작업이 실행될 러너 환경
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: 'npm' }
+      - name: 저장소 체크아웃 🛎️
+        uses: actions/checkout@v4 # 저장소 코드를 러너에 복제합니다.
 
-      - name: Write .env for Vite
-        run: |
-          cat <<EOF > .env
-          VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL || vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_KEY=${{ secrets.VITE_SUPABASE_KEY || vars.VITE_SUPABASE_KEY }}
-          EOF
-          echo ".env created"
+      - name: Node.js 환경 설정 ☕
+        uses: actions/setup-node@v3 # Node.js 환경을 설정합니다.
+        with:
+          node-version: 18 # 사용할 Node.js 버전 지정
+          cache: 'npm' # npm 종속성 캐싱 활성화
+          cache-dependency-path: package-lock.json # 캐시 키를 위한 종속성 파일 지정
 
-      - name: Debug env lengths
-        run: |
-          echo "URL len: $(awk -F= '/VITE_SUPABASE_URL/ {print length($2)}' .env)"
-          echo "KEY len: $(awk -F= '/VITE_SUPABASE_KEY/ {print length($2)}' .env)"
+      - name: 프로젝트 종속성 설치 📦
+        run: npm install # package.json에 정의된 종속성을 설치합니다.
 
-      - run: npm ci
-      - run: npm run build
-      - run: cp dist/index.html dist/404.html
+      - name: Vite 프로젝트 빌드 및 Supabase 환경 변수 전달 🏗️
+        run: npm run build # Vite 빌드 스크립트를 실행합니다.
+        env: # GitHub Secrets를 환경 변수로 빌드 프로세스에 전달합니다.
+          VITE_SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }} # GitHub Secret에서 Supabase Key 가져오기
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }} # GitHub Secret에서 Supabase URL 가져오기
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with: { path: ./dist }
+      - name: GitHub Pages 아티팩트 업로드 🚀
+        uses: actions/upload-pages-artifact@v3 # 빌드된 정적 파일을 GitHub Pages 배포용 아티팩트로 업로드합니다.
+        with:
+          path: './dist' # Vite의 기본 빌드 출력 디렉터리
 
+  # 배포 작업: 빌드된 아티팩트를 GitHub Pages에 배포합니다.
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
     environment:
-      name: github-pages
+      name: github-pages # GitHub Pages 배포를 위한 표준 환경 이름
+      url: ${{ steps.deployment.outputs.page_url }} # 배포된 사이트의 URL을 환경 URL로 설정
+    runs-on: ubuntu-latest # 이 작업이 실행될 러너 환경
+    needs: build # 이 작업은 'build' 작업이 성공적으로 완료된 후에만 실행됩니다.
+
     steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: GitHub Pages에 배포 🌐
+        id: deployment # 이 단계의 ID (출력 참조용)
+        uses: actions/deploy-pages@v4 # 업로드된 아티팩트를 GitHub Pages에 배포하는 공식 액션

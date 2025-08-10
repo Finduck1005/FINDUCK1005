@@ -24,13 +24,20 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      # .env 생성 (필요하면 유지)
+      # ✅ 빌드 전에 .env 생성 (Secrets 또는 Variables 둘 다 대응)
       - name: Write .env for Vite
         run: |
           cat <<EOF > .env
           VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL || vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY || vars.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_KEY=${{ secrets.VITE_SUPABASE_KEY || vars.VITE_SUPABASE_KEY }}
           EOF
+          echo ".env created"
+
+      # (선택) 주입 확인: 길이가 0이면 GitHub에 값이 비어있거나 이름이 다름
+      - name: Debug env lengths
+        run: |
+          echo "URL len: $(awk -F= '/VITE_SUPABASE_URL/ {print length($2)}' .env)"
+          echo "KEY len: $(awk -F= '/VITE_SUPABASE_KEY/ {print length($2)}' .env)"
 
       - run: npm ci
       - run: npm run build
@@ -38,7 +45,6 @@ jobs:
       - name: Add 404 fallback
         run: cp dist/index.html dist/404.html
 
-      # ✅ Pages용 아티팩트 업로드는 이거 "한 번만"
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

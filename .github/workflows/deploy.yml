@@ -31,7 +31,7 @@ jobs:
           EOF
           echo ".env created"
 
-      # (선택) 길이 디버그
+      # (선택) 길이 디버그   
       - name: Debug env lengths
         run: |
           echo "URL len: $(awk -F= '/VITE_SUPABASE_URL/ {print length($2)}' .env)"
